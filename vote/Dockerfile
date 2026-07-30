@@ -1,32 +1,50 @@
-# base defines a base stage that uses the official python runtime base image
-FROM python:3.11-slim AS base
+# Stage 1 — Build
+FROM python:3.11-slim as build
 
-# Add curl for healthcheck
+# Set working directory
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy only requirements first for caching
+COPY requirements.txt .
+
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Stage 2 — Production
+FROM python:3.11-slim
+
+# Install curl
 RUN apt-get update && \
     apt-get install -y --no-install-recommends curl && \
     rm -rf /var/lib/apt/lists/*
+    
+WORKDIR /app
 
-# Set the application directory
-WORKDIR /usr/local/app
+# Copy installed dependencies from build stage
+COPY --from=build /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
+COPY --from=build /usr/local/bin /usr/local/bin
 
-# Install our requirements.txt
-COPY requirements.txt ./requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
-
-# dev defines a stage for development, where it'll watch for filesystem changes
-FROM base AS dev
-RUN pip install watchdog
-ENV FLASK_ENV=development
-CMD ["python", "app.py"]
-
-# final defines the stage that will bundle the application for production
-FROM base AS final
-
-# Copy our code from the current folder to the working directory inside the container
+# Copy application code
 COPY . .
 
-# Make port 80 available for links and/or publish
+# non-root user setup
+RUN groupadd -g 1001 appgroup && \
+    useradd -u 1001 -g appgroup -M -s /usr/sbin/nologin appuser && \
+    chown -R 1001:1001 /app
+USER 1001
+# Expose port
 EXPOSE 80
 
-# Define our command to be run when launching the container
+# Set environment variable for production
+ENV PYTHONUNBUFFERED=1
+ENV ENV=production
+
+# Start Uvicorn via Gunicorn for production
+# CMD ["gunicorn", "-w", "4", "-k", "uvicorn.workers.UvicornWorker", "app:app", "-b", "0.0.0.0:80", "--timeout", "120"]
 CMD ["gunicorn", "app:app", "-b", "0.0.0.0:80", "--log-file", "-", "--access-logfile", "-", "--workers", "4", "--keep-alive", "0"]

@@ -1,25 +1,48 @@
-FROM node:18-slim
+# syntax=docker/dockerfile:1.7
 
-# add curl for healthcheck
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends curl tini && \
-    rm -rf /var/lib/apt/lists/*
+###############################
+# Build Stage
+###############################
+FROM node:22.17.0-alpine3.22 AS builder
 
-WORKDIR /usr/local/app
+# OCI Labels
+LABEL org.opencontainers.image.title="my-node-app" \
+      org.opencontainers.image.description="Production Node.js Application" \
+      org.opencontainers.image.version="1.0.0"
 
-# have nodemon available for local dev use (file watching)
-RUN npm install -g nodemon
+WORKDIR /app
 
+# Copy dependency files first for layer caching
 COPY package*.json ./
 
-RUN npm ci && \
- npm cache clean --force && \
- mv /usr/local/app/node_modules /node_modules
+# Install all dependencies (including dev dependencies)
+RUN --mount=type=cache,target=/root/.npm \
+    npm ci
 
-COPY . .
+# Copy application source
+COPY --link . .
 
+
+
+###############################
+# Runtime Stage
+###############################
+FROM node:22-alpine
+
+WORKDIR /app
+
+RUN apk add --no-cache tini
+
+COPY --from=builder /app .
+
+RUN addgroup -S appgroup && \
+    adduser -S appuser -G appgroup && \
+    chown -R appuser:appgroup /app
+
+USER appuser
 ENV PORT=80
 EXPOSE 80
 
-ENTRYPOINT ["/usr/bin/tini", "--"]
-CMD ["node", "server.js"]
+ENTRYPOINT ["/sbin/tini","--"]
+
+CMD ["node","server.js"]
