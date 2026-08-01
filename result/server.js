@@ -67,14 +67,14 @@ app.use(cookieParser());
 app.use(express.urlencoded());
 app.use(express.static(__dirname + '/views'));
 
-// Temporary debugging middleware
-app.use((req, res, next) => {
-  console.log("Original URL:", req.originalUrl);
-  console.log("URL:", req.url);
-  console.log("X-Original-URI:", req.headers["x-original-uri"]);
-  console.log("X-Rewritten-URI:", req.headers["x-rewritten-uri"]);
-  next();
-});
+// // Temporary debugging middleware
+// app.use((req, res, next) => {
+//   console.log("Original URL:", req.originalUrl);
+//   console.log("URL:", req.url);
+//   console.log("X-Original-URI:", req.headers["x-original-uri"]);
+//   console.log("X-Rewritten-URI:", req.headers["x-rewritten-uri"]);
+//   next();
+// });
 
 app.get('/', function (req, res) {
   res.sendFile(path.resolve(__dirname + '/views/index.html'));
