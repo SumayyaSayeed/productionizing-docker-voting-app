@@ -21,6 +21,7 @@ services:
       - front-tier
   vote:
     build: ./vote
+    image: ${DOCKERHUB_USERNAME}/example-voting-app-vote:${IMAGE_TAG:-latest}
     depends_on:
       redis:
         condition: service_healthy
@@ -38,6 +39,7 @@ services:
 
   result:
     build: ./result
+    image: ${DOCKERHUB_USERNAME}/example-voting-app-result:${IMAGE_TAG:-latest}
     # use nodemon rather than node for local dev
     # entrypoint: nodemon --inspect=0.0.0.0 server.js
     depends_on:
@@ -55,6 +57,7 @@ services:
   worker:
     build:
       context: ./worker
+    image: ${DOCKERHUB_USERNAME}/example-voting-app-worker:${IMAGE_TAG:-latest}
     depends_on:
       redis:
         condition: service_healthy 
