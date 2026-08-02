@@ -1,0 +1,29 @@
+name: Build Worker
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'worker/**'
+      - 'docker-compose.yml'
+      - '.github/workflows/build-service.yml'
+      - '.github/workflows/build-worker.yml'
+
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'worker/**'
+      - 'docker-compose.yml'
+      - '.github/workflows/build-service.yml'
+      - '.github/workflows/build-worker.yml'
+
+jobs:
+  build:
+    uses: ./.github/workflows/build-service.yml
+
+    with:
+      service: worker
+
+    secrets: inherit

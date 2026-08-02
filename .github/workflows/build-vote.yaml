@@ -1,0 +1,29 @@
+name: Build Vote
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'vote/**'
+      - 'docker-compose.yml'
+      - '.github/workflows/build-service.yml'
+      - '.github/workflows/build-vote.yml'
+
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'vote/**'
+      - 'docker-compose.yml'
+      - '.github/workflows/build-service.yml'
+      - '.github/workflows/build-vote.yml'
+
+jobs:
+  build:
+    uses: ./.github/workflows/build-service.yml
+
+    with:
+      service: vote
+
+    secrets: inherit

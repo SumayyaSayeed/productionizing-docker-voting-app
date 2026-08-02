@@ -1,0 +1,29 @@
+name: Build Result
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'result/**'
+      - 'docker-compose.yml'
+      - '.github/workflows/build-service.yml'
+      - '.github/workflows/build-result.yml'
+
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'result/**'
+      - 'docker-compose.yml'
+      - '.github/workflows/build-service.yml'
+      - '.github/workflows/build-result.yml'
+
+jobs:
+  build:
+    uses: ./.github/workflows/build-service.yml
+
+    with:
+      service: result
+
+    secrets: inherit
