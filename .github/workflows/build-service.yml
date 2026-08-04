@@ -33,6 +33,16 @@ jobs:
         run: |
           docker compose build ${{ inputs.service }}
 
+      - name: Scan Image with Trivy
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: ${{ env.DOCKERHUB_USERNAME }}/example-voting-app-${{ inputs.service }}:${{ env.IMAGE_TAG }}
+          format: table
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+
       - name: Push ${{ inputs.service }}
         run: |
           docker compose push ${{ inputs.service }}
