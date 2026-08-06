@@ -20,4 +20,5 @@ locals {
     Terraform   = "true"
     Environment = "dev"
   }
+  user_data = file("${path.module}/scripts/install-docker.sh")
 }

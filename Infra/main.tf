@@ -8,7 +8,7 @@ module "ec2_instance" {
 
   create_security_group        = true
   security_group_ingress_rules = local.security_group_ingress_rules
-    user_data = var.user_data
+    user_data = local.user_data
 
   tags = local.common_tags
 }

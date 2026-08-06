@@ -1,4 +1,4 @@
-name: Terraform Apply
+name: Terraform Destroy
 
 on:
   workflow_dispatch:
@@ -9,7 +9,7 @@ permissions:
 
 jobs:
 
-  plan:
+  list:
 
     defaults:
       run:
@@ -22,27 +22,24 @@ jobs:
       - uses: actions/checkout@v4
 
       - uses: hashicorp/setup-terraform@v3
+
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: ap-south-1
 
-      - run: terraform init
+      - run: terraform state list
 
-      - run: terraform fmt -check
+  destroy:
 
-      - run: terraform validate
-
-      - run: terraform plan
-
-  apply:
-
-    needs: plan
+    defaults:
+      run:
+        working-directory: Infra
 
     runs-on: ubuntu-latest
 
-    environment: DeployInfra
+    environment: DestroyInfra
 
     steps:
 
@@ -56,6 +53,4 @@ jobs:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: ap-south-1
 
-      - run: terraform init
-
-      - run: terraform apply -auto-approve
+      - run: terraform destroy -auto-approve
