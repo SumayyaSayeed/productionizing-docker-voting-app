@@ -1,0 +1,62 @@
+name: Terraform
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+
+  plan:
+
+    defaults:
+      run:
+        working-directory: Infra
+        
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ap-south-1
+
+      - run: terraform init
+
+      - run: terraform fmt -check
+
+      - run: terraform validate
+
+      - run: terraform plan
+
+  apply:
+
+    needs: plan
+
+    runs-on: ubuntu-latest
+
+    environment: DeployInfra
+
+    steps:
+
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ap-south-1
+
+      - run: terraform init
+
+      - run: terraform apply -auto-approve
