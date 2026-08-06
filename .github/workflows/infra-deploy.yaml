@@ -37,7 +37,9 @@ jobs:
       - run: terraform plan
 
   apply:
-
+    defaults:
+      run:
+        working-directory: Infra
     needs: plan
 
     runs-on: ubuntu-latest
