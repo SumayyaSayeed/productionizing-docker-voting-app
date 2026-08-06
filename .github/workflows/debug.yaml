@@ -12,9 +12,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
-      - name: Check OIDC Token Availability
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check OIDC Environment Variables
         run: |
+          echo "Checking OIDC variables..."
+
           if [ -z "$ACTIONS_ID_TOKEN_REQUEST_URL" ]; then
             echo "❌ OIDC URL NOT AVAILABLE"
           else
@@ -26,23 +30,41 @@ jobs:
           else
             echo "✅ OIDC TOKEN AVAILABLE"
           fi
+
       - name: Dump OIDC Claims
         uses: actions/github-script@v7
         with:
           script: |
-            const core = require('@actions/core');
-            const token = await core.getIDToken('sts.amazonaws.com');
+            const url = process.env.ACTIONS_ID_TOKEN_REQUEST_URL + "&audience=sts.amazonaws.com";
+            const token = process.env.ACTIONS_ID_TOKEN_REQUEST_TOKEN;
+
+            const response = await fetch(url, {
+              headers: {
+                Authorization: `Bearer ${token}`
+              }
+            });
+
+            if (!response.ok) {
+              throw new Error(`Failed to get OIDC token: ${response.status}`);
+            }
+
+            const data = await response.json();
 
             const payload = JSON.parse(
-              Buffer.from(token.split('.')[1], 'base64').toString()
+              Buffer.from(data.value.split('.')[1], 'base64url').toString()
             );
 
+            console.log("========== OIDC CLAIMS ==========");
             console.log(JSON.stringify(payload, null, 2));
 
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: arn:aws:iam::640168415108:role/GithubActionRole
+          role-session-name: github-actions
           aws-region: ap-south-1
+          audience: sts.amazonaws.com
 
-      - run: aws sts get-caller-identity
+      - name: Verify AWS Identity
+        run: |
+          aws sts get-caller-identity
