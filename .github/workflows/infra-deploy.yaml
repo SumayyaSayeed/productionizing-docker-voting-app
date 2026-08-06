@@ -27,6 +27,9 @@ jobs:
           echo "Repository: ${{ github.repository }}"
           echo "Ref: ${{ github.ref }}"
           echo "Actor: ${{ github.actor }}"
+      - name: Print Role ARN
+        run: |
+          echo "${{ secrets.AWS_ROLE_ARN }}"
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
