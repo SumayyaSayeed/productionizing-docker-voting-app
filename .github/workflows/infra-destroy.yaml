@@ -28,7 +28,7 @@ jobs:
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: ap-south-1
-
+      - run: terraform init
       - run: terraform state list
 
   destroy:
@@ -36,7 +36,7 @@ jobs:
     defaults:
       run:
         working-directory: Infra
-
+    needs: list
     runs-on: ubuntu-latest
 
     environment: DestroyInfra
