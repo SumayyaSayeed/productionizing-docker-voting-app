@@ -13,6 +13,19 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+      - name: Check OIDC Token Availability
+        run: |
+          if [ -z "$ACTIONS_ID_TOKEN_REQUEST_URL" ]; then
+            echo "❌ OIDC URL NOT AVAILABLE"
+          else
+            echo "✅ OIDC URL AVAILABLE"
+          fi
+
+          if [ -z "$ACTIONS_ID_TOKEN_REQUEST_TOKEN" ]; then
+            echo "❌ OIDC TOKEN NOT AVAILABLE"
+          else
+            echo "✅ OIDC TOKEN AVAILABLE"
+          fi
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
