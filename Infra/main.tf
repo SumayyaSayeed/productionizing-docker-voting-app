@@ -10,7 +10,7 @@ module "ec2_instance" {
 
   create_security_group        = true
   security_group_ingress_rules = local.security_group_ingress_rules
-  create_iam_instance_profile = true
+  create_iam_instance_profile  = true
   iam_role_policies = {
     AmazonSSMManagedInstanceCore = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
     AmazonS3ReadOnlyAccess       = "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
