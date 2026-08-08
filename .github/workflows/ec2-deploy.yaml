@@ -50,12 +50,13 @@ jobs:
             "commands": [
               "echo \"=== Starting Download ===\" > /tmp/deploy.log",
               "date >> /tmp/deploy.log",
-              "aws s3 cp s3://votingappbucket9876/deployment/latest/deployment.tar.gz /tmp/deployment.tar.gz >> /tmp/deploy.log 2>&1",
+              "aws s3 cp s3://${{ env.S3_BUCKET }}/deployment/latest/deployment.tar.gz /tmp/deployment.tar.gz >> /tmp/deploy.log 2>&1",
               "echo Exit Code: $? >> /tmp/deploy.log",
               "ls -lh /tmp >> /tmp/deploy.log 2>&1",
               "cat /tmp/deploy.log",
               "mkdir -p /opt/votingapp >> /tmp/deploy.log 2>&1",
               "tar -xzf /tmp/deployment.tar.gz -C /opt/votingapp >> /tmp/deploy.log 2>&1",
+              "chmod +x /opt/votingapp/ec2deploy.sh",
               "/opt/votingapp/ec2deploy.sh >> /tmp/deploy.log 2>&1"
             ]
           }'
