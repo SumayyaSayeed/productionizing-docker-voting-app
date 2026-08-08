@@ -5,7 +5,3 @@ output "deployment_bucket_name" {
 output "instance_id" {
   value = module.ec2_instance.id
 }
-
-output "instance_name" {
-  value = module.ec2_instance.name
-}

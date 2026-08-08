@@ -50,4 +50,4 @@ jobs:
 
     needs: build
 
-    uses: ./.github/workflows/ec2-deploy.yml
+    uses: ./.github/workflows/ec2-deploy.yaml
