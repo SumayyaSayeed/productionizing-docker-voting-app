@@ -8,10 +8,7 @@ on:
       - 'vote/**'
       - 'docker-compose.yml'
       - '.github/workflows/build-service.yml'
-      - '.github/workflows/build-vote.yml'
-permissions:
-  id-token: write
-  contents: read
+      - '.github/workflows/build-vote.yaml'
   pull_request:
     branches:
       - main
@@ -19,8 +16,10 @@ permissions:
       - 'vote/**'
       - 'docker-compose.yml'
       - '.github/workflows/build-service.yml'
-      - '.github/workflows/build-vote.yml'
-
+      - '.github/workflows/build-vote.yaml'
+permissions:
+  id-token: write
+  contents: read
 jobs:
   build:
     uses: ./.github/workflows/build-service.yml

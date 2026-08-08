@@ -8,10 +8,7 @@ on:
       - 'result/**'
       - 'docker-compose.yml'
       - '.github/workflows/build-service.yml'
-      - '.github/workflows/build-result.yml'
-permissions:
-  id-token: write
-  contents: read
+      - '.github/workflows/build-result.yaml'
   pull_request:
     branches:
       - main
@@ -20,7 +17,9 @@ permissions:
       - 'docker-compose.yml'
       - '.github/workflows/build-service.yml'
       - '.github/workflows/build-result.yml'
-
+permissions:
+  id-token: write
+  contents: read
 jobs:
   build:
     uses: ./.github/workflows/build-service.yml
