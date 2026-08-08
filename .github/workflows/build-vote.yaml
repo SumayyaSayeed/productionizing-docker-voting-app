@@ -9,7 +9,9 @@ on:
       - 'docker-compose.yml'
       - '.github/workflows/build-service.yml'
       - '.github/workflows/build-vote.yml'
-
+permissions:
+  id-token: write
+  contents: read
   pull_request:
     branches:
       - main
