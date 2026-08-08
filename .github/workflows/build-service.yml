@@ -53,3 +53,4 @@ jobs:
     needs: build
 
     uses: ./.github/workflows/ec2-deploy.yaml
+    secrets: inherit
