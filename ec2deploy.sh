@@ -2,21 +2,10 @@
 
 set -e
 
-APP_DIR="/opt/example-voting-app"
+APP_DIR="/opt/votingapp"
 
-BUCKET_NAME=$1
-
-mkdir -p "$APP_DIR"
 
 cd "$APP_DIR"
-
-echo "Downloading deployment bundle..."
-
-aws s3 cp \
-s3://votingappbucket9876/latest/deployment.tar.gz \
-deployment.tar.gz
-
-tar -xzf deployment.tar.gz
 
 echo "Pull latest images..."
 
