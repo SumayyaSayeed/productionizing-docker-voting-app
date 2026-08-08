@@ -1,39 +1,51 @@
 #!/bin/bash
 set -euxo pipefail
 
-# Log everything
+# Log all output
 exec > >(tee /var/log/user-data.log | logger -t user-data) 2>&1
 
-echo "===== Starting User Data Script ====="
+echo "================================================="
+echo "Starting EC2 Bootstrap"
+echo "================================================="
 
-# Update system packages
+# Update packages
 dnf update -y
 
 # Install required packages
 dnf install -y \
     docker \
     git \
-    curl \
-    unzip
-
-# Enable and start Docker
+    unzip \
+    awscli
+#Install Docker Compose
+sudo mkdir -p /usr/local/lib/docker/cli-plugins
+sudo curl -SL \
+https://github.com/docker/compose/releases/download/v2.39.1/docker-compose-linux-x86_64 \
+-o /usr/local/lib/docker/cli-plugins/docker-compose
+sudo chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
+# Enable Docker
 systemctl enable docker
 systemctl start docker
 
 # Add ec2-user to docker group
 usermod -aG docker ec2-user
 
-# Install Docker Compose v2 (if not already available)
-mkdir -p /usr/local/lib/docker/cli-plugins
+# Verify installations
+echo "================================================="
+echo "Installed Versions"
+echo "================================================="
 
-curl -SL \
-  https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64 \
-  -o /usr/local/lib/docker/cli-plugins/docker-compose
-
-chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
-
-# Verify installation
 docker --version
 docker compose version
+aws --version
+git --version
 
-echo "===== Docker Installation Completed ====="
+echo "================================================="
+echo "Docker Status"
+echo "================================================="
+
+systemctl status docker --no-pager
+
+echo "================================================="
+echo "Bootstrap Completed Successfully"
+echo "================================================="
