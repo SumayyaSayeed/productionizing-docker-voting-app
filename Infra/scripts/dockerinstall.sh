@@ -6,25 +6,31 @@ exec > >(tee /var/log/user-data.log | logger -t user-data) 2>&1
 
 echo "===== Starting User Data Script ====="
 
-# Update package index
-apt-get update
+# Update system packages
+dnf update -y
 
 # Install required packages
-apt-get install -y \
-    docker.io \
-    docker-compose-v2 \
-    curl \
+dnf install -y \
+    docker \
     git \
+    curl \
     unzip
 
-# Enable Docker service
+# Enable and start Docker
 systemctl enable docker
-
-# Start Docker
 systemctl start docker
 
-# Add ubuntu user to docker group
-usermod -aG docker ubuntu
+# Add ec2-user to docker group
+usermod -aG docker ec2-user
+
+# Install Docker Compose v2 (if not already available)
+mkdir -p /usr/local/lib/docker/cli-plugins
+
+curl -SL \
+  https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64 \
+  -o /usr/local/lib/docker/cli-plugins/docker-compose
+
+chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
 
 # Verify installation
 docker --version
