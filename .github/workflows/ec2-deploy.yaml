@@ -12,6 +12,7 @@ permissions:
 
 env:
   AWS_REGION: ap-south-1
+  S3_BUCKET: votingappbucket9876
 
 jobs:
 
@@ -37,12 +38,17 @@ jobs:
       - name: Upload Deployment Bundle
         run: |
           aws s3 cp deployment.tar.gz \
-            s3://${{ steps.tf.outputs.bucket }}/deployment/latest/deployment.tar.gz
+            s3://${{ env.S3_BUCKET }}/deployment/latest/deployment.tar.gz
       - name: Trigger Deployment
       # AWS-RunShellScript is an AWS Systems Manager Document (SSM Document).
         run: |
 
           aws ssm send-command \
-            --document-name "AWS-RunShellScript" \
-            --targets "Key=tag:Project,Values=example-voting-app" \
-            --parameters commands="sudo /opt/votingappbucket9876/ec2deploy.sh"
+          --document-name "AWS-RunShellScript" \
+          --targets "Key=tag:Project,Values=example-voting-app" \
+          --parameters 'commands=[
+          "aws s3 cp s3://votingappbucket9876/deployment/latest/deployment.tar.gz /tmp/deployment.tar.gz",
+          "sudo mkdir -p /opt/votingapp",
+          "sudo tar -xzf /tmp/deployment.tar.gz -C /opt/votingapp",
+          "sudo /opt/votingapp/ec2deploy.sh"
+          ]' 
