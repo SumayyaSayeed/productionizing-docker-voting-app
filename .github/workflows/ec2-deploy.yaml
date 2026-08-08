@@ -20,13 +20,24 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-
+      - name: Checkout Repository
+        uses: actions/checkout@v4
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
+      - name: Create Deployment Archive
+        run: |
+          tar -czf deployment.tar.gz \
+            docker-compose.yml \
+            nginx \
+            ec2deploy.sh
 
+      - name: Upload Deployment Bundle
+        run: |
+          aws s3 cp deployment.tar.gz \
+            s3://${{ steps.tf.outputs.bucket }}/deployment/latest/deployment.tar.gz
       - name: Trigger Deployment
       # AWS-RunShellScript is an AWS Systems Manager Document (SSM Document).
         run: |
@@ -34,4 +45,4 @@ jobs:
           aws ssm send-command \
             --document-name "AWS-RunShellScript" \
             --targets "Key=tag:Project,Values=example-voting-app" \
-            --parameters commands="sudo /opt/votingappbucket9876/scripts/deploy.sh"
+            --parameters commands="sudo /opt/votingappbucket9876/ec2deploy.sh"
