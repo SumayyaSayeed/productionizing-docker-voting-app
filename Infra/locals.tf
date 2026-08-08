@@ -16,7 +16,7 @@ locals {
     }
   }
   common_tags = {
-    Project     = "Example Voting App"
+    Project     = "example-voting-app"
     Terraform   = "true"
     Environment = "dev"
   }

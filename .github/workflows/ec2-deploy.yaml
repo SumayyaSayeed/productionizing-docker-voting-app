@@ -34,4 +34,4 @@ jobs:
           aws ssm send-command \
             --document-name "AWS-RunShellScript" \
             --targets "Key=tag:Project,Values=example-voting-app" \
-            --parameters commands="sudo /opt/example-voting-app/scripts/deploy.sh"
+            --parameters commands="sudo /opt/votingappbucket/scripts/deploy.sh"
