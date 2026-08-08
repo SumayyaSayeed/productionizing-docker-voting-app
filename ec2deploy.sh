@@ -13,7 +13,7 @@ cd "$APP_DIR"
 echo "Downloading deployment bundle..."
 
 aws s3 cp \
-s3://votingappbucket/latest/deployment.tar.gz \
+s3://votingappbucket9876/latest/deployment.tar.gz \
 deployment.tar.gz
 
 tar -xzf deployment.tar.gz

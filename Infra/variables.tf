@@ -15,6 +15,6 @@ variable "allowed_ssh_cidr" {
   description = "CIDR block for SSH access"
 }
 variable "bucket_name" {
-  default     = "votingappbucket"
+  default     = "votingappbucket9876"
   description = "S3 bucket name"
 }
