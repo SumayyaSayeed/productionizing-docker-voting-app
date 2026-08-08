@@ -46,3 +46,8 @@ jobs:
       - name: Push ${{ inputs.service }}
         run: |
           docker compose push ${{ inputs.service }}
+  deploy:
+
+    needs: build
+
+    uses: ./.github/workflows/ec2-deploy.yml

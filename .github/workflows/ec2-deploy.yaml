@@ -1,0 +1,37 @@
+name: Deploy to EC2
+
+on:
+
+  workflow_call:
+
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: ap-south-1
+
+jobs:
+
+  deploy:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Trigger Deployment
+      # AWS-RunShellScript is an AWS Systems Manager Document (SSM Document).
+        run: |
+
+          aws ssm send-command \
+            --document-name "AWS-RunShellScript" \
+            --targets "Key=tag:Project,Values=example-voting-app" \
+            --parameters commands="sudo /opt/example-voting-app/scripts/deploy.sh"
