@@ -53,7 +53,7 @@ jobs:
               "aws s3 cp s3://${{ env.S3_BUCKET }}/deployment/latest/deployment.tar.gz /tmp/deployment.tar.gz >> /tmp/deploy.log 2>&1",
               "mkdir -p /opt/votingapp >> /tmp/deploy.log 2>&1",
               "tar -xzf /tmp/deployment.tar.gz -C /opt/votingapp >> /tmp/deploy.log 2>&1",
-              "export DOCKERHUB_USERNAME=${{ env.S3_DOCKERHUB_USERNAME }}",
+              "export DOCKERHUB_USERNAME=${{ env.DOCKERHUB_USERNAME }} >> /tmp/deploy.log 2>&1",
               "chmod +x /opt/votingapp/ec2deploy.sh",
               "/opt/votingapp/ec2deploy.sh >> /tmp/deploy.log 2>&1"
             ]
